@@ -15,7 +15,7 @@ ds_1D_Ne = ColumnDataSource(data_1D_Ne)
 data_1D_Te = get_data_Te()
 ds_1D_Te = ColumnDataSource(data_1D_Te)
 
-data = np.load('data/equilibrium.npz')
+data = np.load(os.path.join('data','equilibrium.npz'))
 
 title_div = Div(text='<h1 style="text-align: center"> COMPASS Upgrade</h1><p>Author: Marcin Kastek</p>')
 select_1D = Select(title="time [s]: ", options=list(data_1D_Ne.columns))
@@ -51,7 +51,7 @@ data_2D_Te = get_2D_section(filename=os.path.join('data','electron_temp.txt'),ro
 
 
 fig_2D_Te = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@im")],x_axis_label=r"$$ R [m] $$", y_axis_label=r"$$z [m]$$",
-                 title=r"Electron temperature Te [eV]")
+                 title=r"Electron temperature Te [eV]",aspect_ratio=1.0)
 fig_2D_Te.x_range.range_padding = fig_2D_Te.y_range.range_padding = 0
 
 
@@ -77,7 +77,7 @@ dict_Ne = get_2D_section(filename=os.path.join('data','electron_density.txt'),ro
 #dic_Ne = {key:data.T for data,key in zip(dict_Ne.values(),dict_Ne.keys())}
 
 fig_2D_Ne = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@im e+19")],x_axis_label=r"$$ R [m] $$", y_axis_label=r"$$z [m]$$",
-                 title=r"Electron density Ne [m-3]")
+                 title=r"Electron density Ne [m-3]",aspect_ratio=1.0)
 fig_2D_Ne.x_range.range_padding = fig_2D_Ne.y_range.range_padding = 0
 
 src_Ne_2D = ColumnDataSource(data={'x':[0.25],'y':[-1],'dw':[1.25],'dh':[2],'im':[dict_Ne[1]]})
