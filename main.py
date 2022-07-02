@@ -123,10 +123,12 @@ button_Ne.js_on_click(CustomJS(args=dict(source=source_cds_2D_Ne ,sl=slider_2D,d
 button_Te.js_on_click(CustomJS(args=dict(source=source_cds_2D_Te,sl=slider_2D,data=data["time"],file='Te'),
                            code=open("download.js").read()))
 
+div_range = Div(text='Generate cross sections from selected region of z[m] and R[m]', margin = (5, 5, 5, 25))
+
 
 div_Ne = Div(text = 'Save selected cross sections of Ne to file', name = "file_Ne", margin = (5, 5, 5, 25))
 
 div_Te = Div(text = 'Save selected cross sections of Te to file', name = "file_Te", margin = (5, 5, 5, 25))
 
 
-show(column(title_div, select_1D, row(fig_1D_Ne, fig_1D_Te), slider_2D, row(lo_Ne_2D, lo_Te_2D), row(div_Ne, button_Ne, div_Te, button_Te)))
+show(column(title_div, select_1D, row(fig_1D_Ne, fig_1D_Te), slider_2D, row(lo_Ne_2D, lo_Te_2D), div_range, row(div_Ne, button_Ne, div_Te, button_Te)))
