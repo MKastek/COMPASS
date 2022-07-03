@@ -2,15 +2,20 @@ function table_to_csv(source) {
     var columns = Object.keys(source.data)
     columns.pop()
     const nrows = source.get_length()
-    const lines = [columns.join(',')]
+    const lines = []
 
     for (let i = 0; i < nrows; i++) {
         let row = [];
         for (let j = 0; j < columns.length; j++) {
             const column = columns[j]
-            row.push(source.data[column][i].toString())
+            //row.push(source.data[column][i].toString())
+            var arr = source.data[column][i].toString().split('\t')
+            for (let k=0; k < arr.length; k++){
+                row.push(arr[k])
+            }
+            //row.push(string[0])
         }
-        lines.push(row.join(','))
+        lines.push(row.join('\t'))
     }
     return lines.join('\n').concat('\n')
 }

@@ -30,7 +30,7 @@ def get_2D_section(filename, to_file = False, rotate = False):
 
     dict = {}
     #53
-    for i in range(1,5):
+    for i in range(1,25):
         data2,time = replace_values(data=data)
         time_Te = pd.read_table('data/time.txt', header=None).iloc[:, 0].values
         idx = (np.abs(time_Te - time[i])).argmin()
@@ -90,7 +90,7 @@ def get_CDS_cross_sections(filename = 'electron_temp.txt'):
 
     CDS_arr = []
 
-    for i in range(1,5):
+    for i in range(1,25):
         data_cross_section = np.array(data_arr[i])
         f = interpolate.interp2d(x, y, data_cross_section[id_r_start:id_r_stop, id_z_start:id_z_stop], kind='linear')
 
@@ -101,6 +101,3 @@ def get_CDS_cross_sections(filename = 'electron_temp.txt'):
             pd.DataFrame(f(xnew,ynew)).replace('e', 'E').to_csv('data.txt', sep='\t', index=False, header=False,  float_format='%0.6E')
         CDS_arr.append(ColumnDataSource(data=pd.read_csv('data.txt',index_col=False)))
     return CDS_arr
-
-
-

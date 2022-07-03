@@ -4,7 +4,7 @@ from bokeh.plotting import figure, output_file, save
 from bokeh.models.tools import HoverTool
 from bokeh.layouts import column, row
 from bokeh.models import Select, Button
-from bokeh.io import show
+from bokeh.io import show, curdoc
 from bokeh.layouts import layout
 import os
 import numpy as np
