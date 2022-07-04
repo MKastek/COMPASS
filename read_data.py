@@ -92,10 +92,7 @@ def get_CDS_cross_sections(filename = 'electron_temp.txt'):
 
     for i in range(1,3):
         data_cross_section = np.array(data_arr[i])
-        print(data_arr[i].shape)
         f = interpolate.interp2d(x, y, data_cross_section[:, id_z_start:id_z_stop], kind='linear')
-
-        #output = io.StringIO()
         if filename == 'electron_density.txt':
             pd.DataFrame(f(xnew,ynew)).replace('e', 'E').to_csv('data.txt', sep='\t', index=False, header=False, float_format='%0.6E')
         if filename == 'electron_temp.txt':
@@ -114,9 +111,5 @@ def get_z_and_R_range():
     r_max = data['r'].max()
     return z_min, z_max, r_min, r_max
 
-"""
-data = np.load(os.path.join('data', 'equilibrium.npz'))
+
 get_CDS_cross_sections(filename = 'electron_temp.txt')
-print(len(data['z']))
-print(len(data['r']))
-"""
