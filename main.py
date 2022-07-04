@@ -115,13 +115,9 @@ output_file(filename="COMPASS_test.html", title="COMPASS")
 button_Ne = Button(label="Save Ne", button_type='primary', margin = (5, 25, 5, 5))
 button_Te = Button(label="Save Te", button_type='primary', margin = (5, 25, 5, 5))
 
-source_cds_2D_Ne = get_CDS_cross_sections(filename='electron_density.txt')
-source_cds_2D_Te = get_CDS_cross_sections(filename='electron_temp.txt')
+source_cds_2D_Ne, znew, rnew = get_CDS_cross_sections(filename='electron_density.txt')
+source_cds_2D_Te, znew, rnew = get_CDS_cross_sections(filename='electron_temp.txt')
 
-button_Ne.js_on_click(CustomJS(args=dict(source=source_cds_2D_Ne ,sl=slider_2D,data=data["time"],file='Ne'),
-                           code=open("download.js").read()))
-button_Te.js_on_click(CustomJS(args=dict(source=source_cds_2D_Te,sl=slider_2D,data=data["time"],file='Te'),
-                           code=open("download.js").read()))
 
 div_range = Div(text='Generate cross sections from selected region of z[m] and R[m]', margin = (5, 5, 5, 25))
 
@@ -130,5 +126,15 @@ div_Ne = Div(text = 'Save selected cross sections of Ne to file', name = "file_N
 
 div_Te = Div(text = 'Save selected cross sections of Te to file', name = "file_Te", margin = (5, 5, 5, 25))
 
+slider_zmin = Slider(start=-0.5,end=0.5,value=-0.5,step=0.01,title='zmin', width=450, width_policy="fixed", margin = (5, 35, 5, 35))
+slider_zmax = Slider(start=-0.5,end=0.5,value=0.5,step=0.01,title='zmax',width=450, width_policy="fixed",  margin = (5, 35, 5, 35))
+slider_rmin = Slider(start=0.25,end=1.5,value=0.25,step=0.01,title='rmin', width=450, width_policy="fixed",  margin = (5, 35, 5, 35))
+slider_rmax = Slider(start=0.25,end=1.5,value=1.5,step=0.01,title='rmax', width=450, width_policy="fixed",  margin = (5, 35, 5, 35))
+### slider min max
 
-show(column(title_div, select_1D, row(fig_1D_Ne, fig_1D_Te), slider_2D, row(lo_Ne_2D, lo_Te_2D), div_range, row(div_Ne, button_Ne, div_Te, button_Te)))
+button_Ne.js_on_click(CustomJS(args=dict(source=source_cds_2D_Ne ,sl=slider_2D,data=data["time"],file='Ne', sl_zmin=slider_zmin, sl_zmax=slider_zmax, sl_rmin=slider_rmin, sl_rmax=slider_rmax, znew=znew, rnew=rnew),
+                           code=open("download.js").read()))
+button_Te.js_on_click(CustomJS(args=dict(source=source_cds_2D_Te,sl=slider_2D,data=data["time"],file='Te', sl_zmin=slider_zmin, sl_zmax=slider_zmax, sl_rmin=slider_rmin, sl_rmax=slider_rmax, znew=znew, rnew=rnew),
+                           code=open("download.js").read()))
+
+show(column(title_div, select_1D, row(fig_1D_Ne, fig_1D_Te), slider_2D, row(lo_Ne_2D, lo_Te_2D), div_range,row(slider_zmin,slider_zmax),row(slider_rmin,slider_rmax), row(div_Ne, button_Ne, div_Te, button_Te)))
