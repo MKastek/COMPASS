@@ -1,12 +1,16 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from bokeh.models import ColumnDataSource
 from scipy import interpolate
 import pandas as pd
 import os
-import io
+
 
 def replace_values(data):
+    """
+    Change unphysical values where psi_n > 1 or psi_n < 0 to -1
+    :param data: data from equilibrium.npz
+    :return: 2D array with psi_n values
+    """
     data_out  = []
     for time_index in range(len(data['time'])):
         data_out.append(np.where((data['psi_n'][time_index,:,:] > 1) | (data['psi_n'][time_index,:,:] < 0), -1, data['psi_n'][time_index,:,:]))
@@ -32,7 +36,7 @@ def get_2D_section(filename, to_file = False, rotate = False):
     #53
     for i in range(1,3):
         data2,time = replace_values(data=data)
-        time_Te = pd.read_table('data/time.txt', header=None).iloc[:, 0].values
+        time_Te = pd.read_table(os.path.join('data','time.txt'), header=None).iloc[:, 0].values
         idx = (np.abs(time_Te - time[i])).argmin()
         psi = pd.read_table(os.path.join('data','psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
         data_Te = pd.read_table(filename,skiprows=2, sep=' ', names= psi).iloc[idx].reset_index()
@@ -51,6 +55,7 @@ def get_2D_section(filename, to_file = False, rotate = False):
 
     return dict
 
+
 def get_data_Ne():
     psi = pd.read_table(os.path.join('data', 'psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
     time = pd.read_table(os.path.join('data', 'time.txt'), header=None).iloc[:, 0].values
@@ -60,6 +65,7 @@ def get_data_Ne():
     data_Ne = data_Ne.transpose()
     data_Ne.columns = [str(np.round(column, 3)) for column in time]
     return data_Ne
+
 
 def get_data_Te():
     psi = pd.read_table(os.path.join('data', 'psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
@@ -71,13 +77,11 @@ def get_data_Te():
     data_Te.columns = [str(np.round(column, 3)) for column in time]
     return data_Te
 
+
 def get_CDS_cross_sections(filename = 'electron_temp.txt'):
     data_arr = get_2D_section(os.path.join('data', filename), to_file=True)
 
     data = np.load(os.path.join('data', 'equilibrium.npz'))
-
-    id_r_start = (np.abs(data['r'] - 0.6)).argmin()
-    id_r_stop = (np.abs(data['r'] - 1.2)).argmin()
 
     id_z_start = (np.abs(data['z'] + 0.5)).argmin()
     id_z_stop = (np.abs(data['z'] - 0.5)).argmin()
@@ -103,7 +107,12 @@ def get_CDS_cross_sections(filename = 'electron_temp.txt'):
     rnew = ynew
     return CDS_arr, znew, rnew
 
+
 def get_z_and_R_range():
+    """
+    Calculates range of coordinates z[m] and R[m]
+    :return: z_min, z_max, r_min, r_max
+    """
     data = np.load(os.path.join('data', 'equilibrium.npz'))
     z_min = data['z'].min()
     z_max = data['z'].max()
@@ -112,4 +121,6 @@ def get_z_and_R_range():
     return z_min, z_max, r_min, r_max
 
 
-get_CDS_cross_sections(filename = 'electron_temp.txt')
+
+
+
