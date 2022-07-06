@@ -18,6 +18,12 @@ def replace_values(data):
 
 
 def replace_with_Te_values(data,data_Te):
+    """
+    Replace array with psi_n values to corresponding physical values Te or Ne.
+    :param data: array with psi_n values
+    :param data_Te:
+    :return:
+    """
     for j in range(data.shape[1]):
         for i in range(data.shape[0]):
             if data[i][j] != -1:
