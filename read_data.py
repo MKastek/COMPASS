@@ -8,80 +8,91 @@ import os
 def replace_values(data):
     """
     Change unphysical values where psi_n > 1 or psi_n < 0 to -1
+
     :param data: data from equilibrium.npz
     :return: 2D array with psi_n values
     """
-    data_out  = []
+    data_out = []
     for time_index in range(len(data['time'])):
-        data_out.append(np.where((data['psi_n'][time_index,:,:] > 1) | (data['psi_n'][time_index,:,:] < 0), -1, data['psi_n'][time_index,:,:]))
+        data_out.append(np.where((data['psi_n'][time_index, :, :] > 1) | (data['psi_n'][time_index, :, :] < 0), -1, data['psi_n'][time_index, :, :]))
     return data_out, data["time"]
 
 
-def replace_with_Te_values(data,data_Te):
+def replace_with_physical_values(data_psi_n, data_physical):
     """
-    Replace array with psi_n values to corresponding physical values Te or Ne.
-    :param data: array with psi_n values
-    :param data_Te:
-    :return:
+    Replace array with psi_n values to corresponding physical values Te or Ne. If psi_n is equal to -1  physical value
+    is set to 0.
+
+    :param data_psi_n: array with psi_n values, shape: r_size, z_size
+    :param data_physical: array with psi_n values and corresponding to it physical value Te or Ne
+    :return: data_psi_n: array with physical value Te or Ne
     """
-    for j in range(data.shape[1]):
-        for i in range(data.shape[0]):
-            if data[i][j] != -1:
-                idx = (np.abs(data_Te['Reff'] - data[i][j])).argmin()
-                data[i][j] = data_Te['Te'][idx]
+
+    z_size = data_psi_n.shape[1]
+    r_size = data_psi_n.shape[0]
+
+    for y in range(z_size):
+        for x in range(r_size):
+            if data_psi_n[x][y] != -1:
+                idx = (np.abs(data_physical['Reff'] - data_psi_n[x][y])).argmin()
+                data_psi_n[x][y] = data_physical['Te'][idx]
             else:
-                data[i][j] = 0
-    return data
+                data_psi_n[x][y] = 0
+
+    return data_psi_n
 
 
 def get_2D_section(filename, to_file = False, rotate = False):
+    """
+    Return dictionary with 2D crossections of physical value Te or Ne.
 
-    data = np.load(os.path.join('data','equilibrium.npz'))
+    :param filename: file with physical value: Te or Ne with respect to time and psi_n
+    :param to_file: bool, if True data with Te are not divided by 10 ** 19
+    :param rotate: bool, if True data are transposed
+    :return:
+    """
 
-    dict = {}
+    data_COMPASS = np.load(os.path.join('data','equilibrium.npz'))
+
+    dict_2D_sections = {}
     #53
     for i in range(1,3):
-        data2,time = replace_values(data=data)
+        data_cleaned, time = replace_values(data=data_COMPASS)
         time_Te = pd.read_table(os.path.join('data','time.txt'), header=None).iloc[:, 0].values
         idx = (np.abs(time_Te - time[i])).argmin()
         psi = pd.read_table(os.path.join('data','psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
         data_Te = pd.read_table(filename,skiprows=2, sep=' ', names= psi).iloc[idx].reset_index()
-        data_Te.rename(columns = {'index':'Reff', idx:'Te'}, inplace = True)
+        data_Te.rename(columns = {'index': 'Reff', idx:' Te'}, inplace = True)
 
-        data3 = replace_with_Te_values(data=data2[i], data_Te=data_Te)
+        data_with_physical_values = replace_with_physical_values(data_psi_n=data_cleaned[i],  data_physical=data_Te)
         if rotate:
-            data3 = data3.T
+            data_with_physical_values = data_with_physical_values.T
         if filename == 'electron_temp.txt':
-            dict[i] = data3
+            dict_2D_sections[i] = data_with_physical_values
         else:
             if not to_file:
-                dict[i] = data3 / 10 ** 19
+                dict_2D_sections[i] = data_with_physical_values / 10 ** 19
             else:
-                dict[i] = data3
+                dict_2D_sections[i] = data_with_physical_values
 
-    return dict
+    return dict_2D_sections
 
 
-def get_data_Ne():
+def get_physical_data(filename):
+    """
+    Return data with physical value: Te or Ne with respect to time and psi_n
+
+    :param filename: file with physical value: Te or Ne with respect to time and psi_n
+    :return:
+    """
     psi = pd.read_table(os.path.join('data', 'psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
     time = pd.read_table(os.path.join('data', 'time.txt'), header=None).iloc[:, 0].values
 
-    data_Ne = pd.read_table(os.path.join('data', 'electron_density.txt'), skiprows=2, sep=' ',
+    data_Ne = pd.read_table(os.path.join('data', filename), skiprows=2, sep=' ',
                             names=[str(np.round(i, 2)) for i in psi])
     data_Ne = data_Ne.transpose()
     data_Ne.columns = [str(np.round(column, 3)) for column in time]
     return data_Ne
-
-
-def get_data_Te():
-    psi = pd.read_table(os.path.join('data', 'psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
-    time = pd.read_table(os.path.join('data', 'time.txt'), header=None).iloc[:, 0].values
-
-    data_Te = pd.read_table(os.path.join('data', 'electron_temp.txt'), skiprows=2, sep=' ',
-                            names=[str(np.round(i, 2)) for i in psi])
-    data_Te = data_Te.transpose()
-    data_Te.columns = [str(np.round(column, 3)) for column in time]
-    return data_Te
 
 
 def get_CDS_cross_sections(filename = 'electron_temp.txt'):
@@ -117,6 +128,7 @@ def get_CDS_cross_sections(filename = 'electron_temp.txt'):
 def get_z_and_R_range():
     """
     Calculates range of coordinates z[m] and R[m]
+
     :return: z_min, z_max, r_min, r_max
     """
     data = np.load(os.path.join('data', 'equilibrium.npz'))
@@ -125,8 +137,6 @@ def get_z_and_R_range():
     r_min = data['r'].min()
     r_max = data['r'].max()
     return z_min, z_max, r_min, r_max
-
-
 
 
 

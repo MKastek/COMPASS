@@ -1,4 +1,4 @@
-from read_data import get_2D_section, get_data_Ne, get_data_Te, get_CDS_cross_sections
+from read_data import get_2D_section, get_CDS_cross_sections, get_physical_data
 from bokeh.models import ColumnDataSource, Slider, CustomJS, Div
 from bokeh.plotting import figure, output_file, save
 from bokeh.models.tools import HoverTool
@@ -9,10 +9,10 @@ from bokeh.layouts import layout
 import os
 import numpy as np
 
-data_1D_Ne = get_data_Ne()
+data_1D_Ne = get_physical_data('electron_density.txt')
 ds_1D_Ne = ColumnDataSource(data_1D_Ne)
 
-data_1D_Te = get_data_Te()
+data_1D_Te = get_physical_data('electron_temp.txt')
 ds_1D_Te = ColumnDataSource(data_1D_Te)
 
 data = np.load(os.path.join('data','equilibrium.npz'))
