@@ -1,4 +1,4 @@
-# COMPASS 
+# COMPASS - bokeh application
 
 COMPASS is a compact tokamak fusion energy device in Czech Republic.  
 This simply bokeh application allows to study cross sections of plasma electron temperature Te[eV] and electron density Ne[1/m^3]. Input data are stored in data directory. Original data are save in equilibrium.npz file.
