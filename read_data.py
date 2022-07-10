@@ -18,7 +18,7 @@ def replace_values(data):
     return data_out, data["time"]
 
 
-def replace_with_physical_values(data_psi_n, data_physical):
+def replace_with_physical_values(data_psi_n, data_physical, key):
     """
     Replace array with psi_n values to corresponding physical values Te or Ne. If psi_n is equal to -1  physical value
     is set to 0.
@@ -35,14 +35,14 @@ def replace_with_physical_values(data_psi_n, data_physical):
         for x in range(r_size):
             if data_psi_n[x][y] != -1:
                 idx = (np.abs(data_physical['Reff'] - data_psi_n[x][y])).argmin()
-                data_psi_n[x][y] = data_physical['Te'][idx]
+                data_psi_n[x][y] = data_physical[key][idx]
             else:
                 data_psi_n[x][y] = 0
 
     return data_psi_n
 
 
-def get_2D_section(filename, to_file = False, rotate = False):
+def get_2D_section(filename, key, to_file = False, rotate = False):
     """
     Return dictionary with 2D crossections of physical value Te or Ne.
 
@@ -62,9 +62,9 @@ def get_2D_section(filename, to_file = False, rotate = False):
         idx = (np.abs(time_Te - time[i])).argmin()
         psi = pd.read_table(os.path.join('data','psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
         data_Te = pd.read_table(filename,skiprows=2, sep=' ', names= psi).iloc[idx].reset_index()
-        data_Te.rename(columns = {'index': 'Reff', idx:' Te'}, inplace = True)
+        data_Te.rename(columns = {'index': 'Reff', idx: key}, inplace = True)
 
-        data_with_physical_values = replace_with_physical_values(data_psi_n=data_cleaned[i],  data_physical=data_Te)
+        data_with_physical_values = replace_with_physical_values(data_psi_n=data_cleaned[i],  data_physical=data_Te, key=key)
         if rotate:
             data_with_physical_values = data_with_physical_values.T
         if filename == 'electron_temp.txt':
@@ -95,8 +95,15 @@ def get_physical_data(filename):
     return data_Ne
 
 
-def get_CDS_cross_sections(filename = 'electron_temp.txt'):
-    data_arr = get_2D_section(os.path.join('data', filename), to_file=True)
+def get_CDS_cross_sections(filename, key):
+    """
+    Return array of ColumnDataSource with 2D data Te or Ne. Length of array is eqaul to number of time steps.
+
+    :param filename:
+    :param key:
+    :return:
+    """
+    data_arr = get_2D_section(os.path.join('data', filename), to_file=True, key=key)
 
     data = np.load(os.path.join('data', 'equilibrium.npz'))
 
