@@ -67,7 +67,7 @@ def get_2D_section(filename, key, to_file = False, rotate = False):
         data_with_physical_values = replace_with_physical_values(data_psi_n=data_cleaned[i],  data_physical=data_Te, key=key)
         if rotate:
             data_with_physical_values = data_with_physical_values.T
-        if filename == 'electron_temp.txt':
+        if os.path.basename(filename) == 'electron_temp.txt':
             dict_2D_sections[i] = data_with_physical_values
         else:
             if not to_file:
@@ -144,6 +144,4 @@ def get_z_and_R_range():
     r_min = data['r'].min()
     r_max = data['r'].max()
     return z_min, z_max, r_min, r_max
-
-
 

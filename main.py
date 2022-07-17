@@ -145,5 +145,5 @@ button_Te.js_on_click(CustomJS(args=dict(source=source_cds_2D_Te,sl=slider_2D,da
 
 # SHOW
 
-output_file(filename="COMPASS_test.html", title="COMPASS")
+output_file(filename="COMPASS_test_v2.0.html", title="COMPASS")
 show(column(title_div, select_1D, row(fig_1D_Ne, fig_1D_Te), slider_2D, row(lo_Ne_2D, lo_Te_2D), div_range,row(slider_zmin,slider_zmax,slider_rmin,slider_rmax), row(div_Ne, button_Ne, div_Te, button_Te)))
