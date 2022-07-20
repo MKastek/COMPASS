@@ -34,8 +34,11 @@ def replace_with_physical_values(data_psi_n, data_physical, key):
     for y in range(z_size):
         for x in range(r_size):
             if data_psi_n[x][y] != -1:
-                idx = (np.abs(data_physical['Reff'] - data_psi_n[x][y])).argmin()
-                data_psi_n[x][y] = data_physical[key][idx]
+                f = interpolate.interp1d(data_physical['Reff'], data_physical[key])
+                Reff_new = np.arange(0,1,0.001)
+                data_physical_interpolated = f(Reff_new)
+                idx = (np.abs(Reff_new - data_psi_n[x][y])).argmin()
+                data_psi_n[x][y] = data_physical_interpolated[idx]
             else:
                 data_psi_n[x][y] = 0
 
@@ -55,8 +58,8 @@ def get_2D_section(filename, key, to_file = False, rotate = False):
     data_COMPASS = np.load(os.path.join('data','equilibrium.npz'))
 
     dict_2D_sections = {}
-
-    for i in range(1,data_COMPASS['psi_n'].shape[0]):
+    #data_COMPASS['psi_n'].shape[0]
+    for i in range(1,3):
         data_cleaned, time = replace_values(data=data_COMPASS)
         time_Te = pd.read_table(os.path.join('data','time.txt'), header=None).iloc[:, 0].values
         idx = (np.abs(time_Te - time[i])).argmin()
@@ -78,24 +81,24 @@ def get_2D_section(filename, key, to_file = False, rotate = False):
     return dict_2D_sections
 
 
-def get_physical_data(filename):
+def get_physical_data(dir, filename):
     """
     Return data with physical value: Te or Ne with respect to time and psi_n
 
     :param filename: file with physical value: Te or Ne with respect to time and psi_n
     :return:
     """
-    psi = pd.read_table(os.path.join('data', 'psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
-    time = pd.read_table(os.path.join('data', 'time.txt'), header=None).iloc[:, 0].values
+    psi = pd.read_table(os.path.join(dir, 'psi_n.txt'), skiprows=2, sep=' ').iloc[0].values
+    time = pd.read_table(os.path.join(dir, 'time.txt'), header=None).iloc[:, 0].values
 
-    data_Ne = pd.read_table(os.path.join('data', filename), skiprows=2, sep=' ',
+    data_Ne = pd.read_table(os.path.join(dir, filename), skiprows=2, sep=' ',
                             names=[str(np.round(i, 2)) for i in psi])
     data_Ne = data_Ne.transpose()
     data_Ne.columns = [str(np.round(column, 3)) for column in time]
     return data_Ne
 
 
-def get_CDS_cross_sections(filename, key):
+def get_CDS_cross_sections(dir, filename, key):
     """
     Return array of ColumnDataSource with 2D data Te or Ne. Length of array is eqaul to number of time steps.
 
@@ -103,9 +106,9 @@ def get_CDS_cross_sections(filename, key):
     :param key:
     :return:
     """
-    data_arr = get_2D_section(os.path.join('data', filename), to_file=True, key=key)
+    data_arr = get_2D_section(os.path.join(dir, filename), to_file=True, key=key)
 
-    data = np.load(os.path.join('data', 'equilibrium.npz'))
+    data = np.load(os.path.join(dir, 'equilibrium.npz'))
 
     id_z_start = (np.abs(data['z'] + 0.5)).argmin()
     id_z_stop = (np.abs(data['z'] - 0.5)).argmin()
@@ -117,8 +120,9 @@ def get_CDS_cross_sections(filename, key):
     xnew = np.linspace(-0.5, 0.5, num=200)
 
     CDS_arr = []
-    data_COMPASS = np.load(os.path.join('data', 'equilibrium.npz'))
-    for i in range(1,data_COMPASS['psi_n'].shape[0]):
+    data_COMPASS = np.load(os.path.join(dir, 'equilibrium.npz'))
+    #data_COMPASS['psi_n'].shape[0]
+    for i in range(1,3):
         data_cross_section = np.array(data_arr[i])
         f = interpolate.interp2d(x, y, data_cross_section[:, id_z_start:id_z_stop], kind='linear')
         if filename == 'electron_density.txt':

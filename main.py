@@ -16,13 +16,15 @@ Get data - 1D for Te and Ne.
 data - all data for COMPASS
 """
 
-data_1D_Ne = get_physical_data('electron_density.txt')
+dir = 'data'
+
+data_1D_Ne = get_physical_data(dir, 'electron_density.txt')
 ds_1D_Ne = ColumnDataSource(data_1D_Ne)
 
-data_1D_Te = get_physical_data('electron_temp.txt')
+data_1D_Te = get_physical_data(dir, 'electron_temp.txt')
 ds_1D_Te = ColumnDataSource(data_1D_Te)
 
-data = np.load(os.path.join('data','equilibrium.npz'))
+data = np.load(os.path.join(dir,'equilibrium.npz'))
 
 title_div = Div(text='<h1 style="text-align: center"> COMPASS Upgrade</h1><p>Author: Marcin Kastek</p>')
 select_1D = Select(title="time [s]: ", options=list(data_1D_Ne.columns))
@@ -54,7 +56,7 @@ select_1D.js_on_change('value', handler_1D_Te)
 # 2D DATA
 # Te
 
-data_2D_Te = get_2D_section(filename=os.path.join('data','electron_temp.txt'),rotate=True, key='Te')
+data_2D_Te = get_2D_section(filename=os.path.join(dir,'electron_temp.txt'),rotate=True, key='Te')
 
 
 fig_2D_Te = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@im")],x_axis_label=r"$$ R [m] $$", y_axis_label=r"$$z [m]$$",
@@ -83,7 +85,7 @@ lo_Te_2D = layout([fig_2D_Te])
 # 2D DATA
 # Ne
 
-data_2D_Ne = get_2D_section(filename=os.path.join('data','electron_density.txt'),rotate=True, key='Ne')
+data_2D_Ne = get_2D_section(filename=os.path.join(dir,'electron_density.txt'),rotate=True, key='Ne')
 #dic_Ne = {key:data.T for data,key in zip(dict_Ne.values(),dict_Ne.keys())}
 
 fig_2D_Ne = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@im e+19")],x_axis_label=r"$$ R [m] $$", y_axis_label=r"$$z [m]$$",
@@ -123,8 +125,10 @@ slider_2D.js_on_change('value',CustomJS(args=dict(data=data["time"],sl=slider_2D
 button_Ne = Button(label="Save Ne", button_type='primary', margin = (5, 25, 5, 5))
 button_Te = Button(label="Save Te", button_type='primary', margin = (5, 25, 5, 5))
 
-source_cds_2D_Ne, znew, rnew = get_CDS_cross_sections(filename='electron_density.txt', key='Ne')
-source_cds_2D_Te, _, _ = get_CDS_cross_sections(filename='electron_temp.txt', key='Te')
+# CDS cross sections
+
+source_cds_2D_Ne, znew, rnew = get_CDS_cross_sections(dir=dir, filename='electron_density.txt', key='Ne')
+source_cds_2D_Te, _, _ = get_CDS_cross_sections(dir=dir, filename='electron_temp.txt', key='Te')
 
 div_range = Div(text='Generate cross sections from selected region of z[m] and R[m]', margin = (5, 5, 5, 25))
 
