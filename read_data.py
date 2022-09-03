@@ -59,7 +59,7 @@ def get_2D_section(filename, key, to_file = False, rotate = False):
 
     dict_2D_sections = {}
     #data_COMPASS['psi_n'].shape[0]
-    for i in range(1,3):
+    for i in range(1,data_COMPASS['psi_n'].shape[0]):
         data_cleaned, time = replace_values(data=data_COMPASS)
         time_Te = pd.read_table(os.path.join('data','time.txt'), header=None).iloc[:, 0].values
         idx = (np.abs(time_Te - time[i])).argmin()
@@ -122,7 +122,7 @@ def get_CDS_cross_sections(dir, filename, key):
     CDS_arr = []
     data_COMPASS = np.load(os.path.join(dir, 'equilibrium.npz'))
     #data_COMPASS['psi_n'].shape[0]
-    for i in range(1,3):
+    for i in range(1,data_COMPASS['psi_n'].shape[0]):
         data_cross_section = np.array(data_arr[i])
         f = interpolate.interp2d(x, y, data_cross_section[:, id_z_start:id_z_stop], kind='linear')
         if filename == 'electron_density.txt':
