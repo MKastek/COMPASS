@@ -15,7 +15,7 @@ Visualization of 2D cross sections Te and Ne with respect to time, generation da
 ![alt text](https://github.com/MKastek/COMPASS/blob/master/images/COMPASS_02.PNG)
 
 
-# Examples:
+# Example
 Generate HTML file with bokeh application for specific plasma scenario:
 ```
 python compass.py 3100
