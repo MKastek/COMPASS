@@ -20,3 +20,4 @@ Generate HTML file with bokeh application for specific plasma scenario:
 ```
 python compass.py 3100
 ```
+Output file: [COMPASS_scenario_3100.html](https://github.com/MKastek/COMPASS/blob/master/output-data/COMPASS_scenario_3100.html)
