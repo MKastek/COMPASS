@@ -13,3 +13,10 @@ Visualization of Te(Reff) and Ne(Reff) with respect to time:
 ### 2D Data - Te [eV], Ne [1/m^3]
 Visualization of 2D cross sections Te and Ne with respect to time, generation data to file:
 ![alt text](https://github.com/MKastek/COMPASS/blob/master/images/COMPASS_02.PNG)
+
+
+# Example
+Generate HTML file with bokeh application for specific plasma scenario:
+```
+python compass.py 3100
+```
