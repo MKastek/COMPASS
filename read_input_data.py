@@ -3,7 +3,7 @@ from bokeh.models import ColumnDataSource
 from scipy import interpolate
 import pandas as pd
 import os
-
+from pathlib import Path
 
 def replace_values(data):
     """
@@ -14,7 +14,7 @@ def replace_values(data):
     """
     data_out = []
     for time_index in range(len(data['time'])):
-        data_out.append(np.where((data['psi_n'][time_index, :, :] > 1) | (data['psi_n'][time_index, :, :] < 0), -1, data['psi_n'][time_index, :, :]))
+        data_out.append(np.where((data['psi_n'][time_index, :, :] > 1) | (data['psi_n'][time_index, :, :] < 0), 0, data['psi_n'][time_index, :, :]))
     return data_out, data["time"]
 
 
@@ -33,7 +33,7 @@ def replace_with_physical_values(data_psi_n, data_physical, key):
 
     for y in range(z_size):
         for x in range(r_size):
-            if data_psi_n[x][y] != -1:
+            if data_psi_n[x][y] != 0:
                 f = interpolate.interp1d(data_physical['Reff'], data_physical[key])
                 Reff_new = np.arange(0,1,0.001)
                 data_physical_interpolated = f(Reff_new)
@@ -59,6 +59,7 @@ def get_2D_section(filename, key, to_file = False, rotate = False):
 
     dict_2D_sections = {}
     #data_COMPASS['psi_n'].shape[0]
+
     for i in range(1,data_COMPASS['psi_n'].shape[0]):
         data_cleaned, time = replace_values(data=data_COMPASS)
         time_Te = pd.read_table(os.path.join('data','time.txt'), header=None).iloc[:, 0].values
@@ -122,7 +123,8 @@ def get_CDS_cross_sections(dir, filename, key):
     CDS_arr = []
     data_COMPASS = np.load(os.path.join(dir, 'equilibrium.npz'))
     #data_COMPASS['psi_n'].shape[0]
-    for i in range(1,data_COMPASS['psi_n'].shape[0]):
+    #for i in range(1, data_COMPASS['psi_n'].shape[0]):
+    for i in range(1,2):
         data_cross_section = np.array(data_arr[i])
         f = interpolate.interp2d(x, y, data_cross_section[:, id_z_start:id_z_stop], kind='linear')
         if filename == 'electron_density.txt':
@@ -149,3 +151,7 @@ def get_z_and_R_range():
     r_max = data['r'].max()
     return z_min, z_max, r_min, r_max
 
+if __name__ == "__main__":
+    dir = Path() / 'input-data' / f"data-{str(3100)}"
+    dict_2D_sections = get_2D_section(filename=os.path.join(dir,'electron_density.txt'), key= 'Te', to_file = False, rotate = False)
+    print(dict_2D_sections)

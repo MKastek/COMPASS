@@ -28,7 +28,7 @@ data - all data for COMPASS
 if __name__ == "__main__":
     parser = initParser()
     args = parser.parse_args()
-    read_scenarios()
+    #read_scenarios()
 
     dir = Path() / 'input-data' / f"data-{str(args.scenario)}"
 
