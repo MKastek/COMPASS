@@ -151,7 +151,8 @@ def get_z_and_R_range():
     r_max = data['r'].max()
     return z_min, z_max, r_min, r_max
 
+
 if __name__ == "__main__":
     dir = Path() / 'input-data' / f"data-{str(3100)}"
-    dict_2D_sections = get_2D_section(filename=os.path.join(dir,'electron_density.txt'), key= 'Te', to_file = False, rotate = False)
+    dict_2D_sections = get_2D_section(filename=os.path.join(dir,'electron_density.txt'), key='Te', to_file=False, rotate=False)
     print(dict_2D_sections)

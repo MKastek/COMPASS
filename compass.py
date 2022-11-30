@@ -19,16 +19,10 @@ def initParser():
 
     return parser
 
-# 1D DATA
-"""
-Get data - 1D for Te and Ne.
-data - all data for COMPASS
-"""
 
 if __name__ == "__main__":
     parser = initParser()
     args = parser.parse_args()
-    #read_scenarios()
 
     dir = Path() / 'input-data' / f"data-{str(args.scenario)}"
 
@@ -72,20 +66,16 @@ if __name__ == "__main__":
 
     data_2D_Te = get_2D_section(filename=os.path.join(dir,'electron_temp.txt'),rotate=True, key='Te')
 
-
     fig_2D_Te = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@im")],x_axis_label=r"$$ R [m] $$", y_axis_label=r"$$z [m]$$",
                      title=r"Electron temperature Te [eV]",aspect_ratio=1.0)
     fig_2D_Te.x_range.range_padding = fig_2D_Te.y_range.range_padding = 0
-
 
     src_Te_2D = ColumnDataSource(data={'x':[0.25],'y':[-1],'dw':[1.25],'dh':[2],'im':[data_2D_Te[1]]})
     im_rend_2D_Te =fig_2D_Te.image(image='im', x='x', y='y', dw='dw', dh='dh', palette="Plasma11", level="image",source=src_Te_2D)
 
     fig_2D_Te.grid.grid_line_width = 0.5
 
-
     slider_2D = Slider(start=1,end=54,value=1,step=1,title='Time atfer ignition [s]: 0.050 Time step')
-
 
     cb = CustomJS(args=dict(src=src_Te_2D,imdict=data_2D_Te,sl=slider_2D)
                   ,code='''
@@ -100,7 +90,6 @@ if __name__ == "__main__":
     # Ne
 
     data_2D_Ne = get_2D_section(filename=os.path.join(dir,'electron_density.txt'),rotate=True, key='Ne')
-    #dic_Ne = {key:data.T for data,key in zip(dict_Ne.values(),dict_Ne.keys())}
 
     fig_2D_Ne = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@im e+19")],x_axis_label=r"$$ R [m] $$", y_axis_label=r"$$z [m]$$",
                      title=r"Electron density Ne [m-3]",aspect_ratio=1.0)
@@ -111,7 +100,6 @@ if __name__ == "__main__":
     im_rend_Ne = fig_2D_Ne.image(image='im', x='x', y='y', dw='dw', dh='dh', palette="Plasma11", level="image",source=src_Ne_2D)
 
     fig_2D_Ne.grid.grid_line_width = 0.5
-
 
     cb = CustomJS(args=dict(src=src_Ne_2D,imdict=data_2D_Ne,sl=slider_2D)
                   ,code='''
@@ -154,7 +142,6 @@ if __name__ == "__main__":
     slider_zmax = Slider(start=-0.5,end=0.5,value=0.5,step=0.01,title='zmax',width=250, width_policy="fixed",  margin = (5, 25, 5, 25))
     slider_rmin = Slider(start=0.25,end=1.5,value=0.25,step=0.01,title='rmin', width=250, width_policy="fixed",  margin = (5, 25, 5, 25))
     slider_rmax = Slider(start=0.25,end=1.5,value=1.5,step=0.01,title='rmax', width=250, width_policy="fixed",  margin = (5, 25, 5, 25))
-
 
     button_Ne.js_on_click(CustomJS(args=dict(source=source_cds_2D_Ne ,sl=slider_2D,data=data["time"],file='Ne', sl_zmin=slider_zmin, sl_zmax=slider_zmax, sl_rmin=slider_rmin, sl_rmax=slider_rmax, znew=znew, rnew=rnew),
                                code=open("download.js").read()))
